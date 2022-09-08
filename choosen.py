@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import queue
+import heapq
 import argparse
 import os
 import random
@@ -22,7 +23,8 @@ else:
     our_seed = int(our_seed)
 random.seed(our_seed)
     
-q = queue.PriorityQueue()
+# q = queue.PriorityQueue()
+q = []
 fd = sys.stdin
 if args.fd is not None:
   fd = open(args.fd)
@@ -32,10 +34,10 @@ try:
         v = random.random()
         t = (v,line.rstrip('\r\n'))
         # could compare against the known min in the queue
-        q.put_nowait( t )
+        heapq.heappush(q,  t )
         # keep the queue to q.size() <= n
-        while (q.qsize() > n):
-            _ = q.get_nowait()
+        while (len(q) > n):
+            _ = heapq.heappop(q)
 except KeyboardInterrupt as e:
     #print(str(e), file=sys.stderr)
     None
@@ -44,10 +46,10 @@ except IOError as e:
     None
 
 # ensure we have only n or less
-while (q.qsize() > n):
-    _ = q.get_nowait()
+while (len(q) > n):
+    _ = heapq.heappop(q)
 
-while not q.empty():
-    (v,l) = q.get_nowait()
+while len(q) > 0:
+    (v,l) = heapq.heappop(q)
     # print(f'{v} {len(l)} {l}')
     print(l)
